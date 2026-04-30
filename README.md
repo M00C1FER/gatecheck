@@ -1,3 +1,9 @@
+> ⚠️ **DEPRECATED — v0.1 archived 2026-04-30.**  This repo was a portfolio exercise. After a 12-iteration / 27-domain competitive analysis, the recommended production path is:
+>
+> **kingfisher** (https://github.com/mongodb/kingfisher) — 942 rules + live secret validation · **trufflehog** (https://github.com/trufflesecurity/trufflehog) — established secret scanner · **prek** (https://prek.j178.dev) — Rust pre-commit framework
+>
+> The code below remains available for reference but is **no longer maintained**. See the linked alternatives for production use.
+
 # gatecheck
 
 > **Ultra-fast pre-commit secret + license scanner.** Single Rust binary with **~4 ms cold start** (vs Python's ~150 ms minimum), so every developer can run it on every commit without complaining. Library + CLI; embeds via `crates.io` into other Rust dev tools.
