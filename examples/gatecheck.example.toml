@@ -1,0 +1,18 @@
+# gatecheck.example.toml — copy to ./gatecheck.toml and customize.
+
+# Severity at which gatecheck exits non-zero. Default: "high".
+# Options: "critical" | "high" | "medium" | "low"
+fail_at = "high"
+
+# Disable specific built-in rules (run `gatecheck --list-rules` to see all).
+disable = [
+    # "bearer-token",        # noisy in some auth-heavy codebases
+]
+
+# Lines matching ANY of these regexes are skipped entirely.
+# Useful for documented "pretend secret" examples in tests / fixtures.
+exempt_patterns = [
+    "AKIAIOSFODNN7EXAMPLE",         # the literal AWS docs example
+    "EXAMPLE_KEY",                  # any line tagged EXAMPLE_KEY
+    "fixtures/.*\\.txt",            # don't scan fixture files (when running on filenames)
+]

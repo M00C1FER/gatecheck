@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Drop into .git/hooks/pre-commit and chmod +x.
+# Aborts the commit if gatecheck finds anything at the configured fail threshold.
+set -e
+gatecheck --staged --threshold high
