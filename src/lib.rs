@@ -104,8 +104,14 @@ const RULES: &[Rule] = &[
     Rule {
         name: "github-fine-grained",
         severity: Severity::Critical,
-        regex: r"github_pat_[A-Za-z0-9_]{82}",
+        regex: r"github_pat_[A-Za-z0-9_]{82,}",
         explanation: "GitHub fine-grained PAT — revoke and rotate.",
+    },
+    Rule {
+        name: "openai-api-key",
+        severity: Severity::Critical,
+        regex: r"sk-(?:proj|svcacct)-[A-Za-z0-9_\-]{20,}|sk-[A-Za-z0-9]{20,}",
+        explanation: "OpenAI API key — revoke at https://platform.openai.com/api-keys.",
     },
     Rule {
         name: "slack-token",

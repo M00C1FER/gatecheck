@@ -1,0 +1,12 @@
+- id: gatecheck
+  name: gatecheck secret + license scanner
+  description: >
+    Ultra-fast Rust-based secret and license scanner.
+    Scans staged diffs for secrets (AWS keys, GitHub PATs, OpenAI keys, etc.)
+    and license-conflict text before every commit.
+  language: rust
+  entry: gatecheck
+  args: ["--staged"]
+  pass_filenames: false
+  stages: [pre-commit]
+  types: [text]

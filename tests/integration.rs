@@ -15,6 +15,28 @@ fn detects_github_token() {
 }
 
 #[test]
+fn detects_github_fine_grained_pat() {
+    // Fine-grained PATs are `github_pat_` + ≥82 alphanumeric/underscore chars.
+    let long_token = format!("github_pat_{}", "A".repeat(82));
+    let f = scan(&long_token, &Config::default());
+    assert!(f.iter().any(|x| x.rule == "github-fine-grained"), "expected fine-grained finding; got {:?}", f);
+}
+
+#[test]
+fn detects_openai_classic_key() {
+    // Classic sk- format (≥20 alphanumeric chars after prefix).
+    let f = scan("OPENAI_API_KEY=sk-AbCdEfGhIjKlMnOpQrStUvWxYz123456789012345678", &Config::default());
+    assert!(f.iter().any(|x| x.rule == "openai-api-key"), "expected openai-api-key; got {:?}", f);
+}
+
+#[test]
+fn detects_openai_project_key() {
+    // New sk-proj- format (project-scoped API keys).
+    let f = scan("key = sk-proj-AbCdEfGhIjKlMnOpQrStUvWxYz123456789012345678", &Config::default());
+    assert!(f.iter().any(|x| x.rule == "openai-api-key"), "expected openai-api-key; got {:?}", f);
+}
+
+#[test]
 fn detects_private_key_block() {
     let f = scan("-----BEGIN RSA PRIVATE KEY-----\nABC\n-----END RSA PRIVATE KEY-----", &Config::default());
     assert!(f.iter().any(|x| x.rule == "private-key"));
@@ -66,9 +88,22 @@ fn fail_threshold_critical_only() {
 #[test]
 fn rule_names_non_empty() {
     let names = rule_names();
-    assert!(names.len() >= 9, "expected ≥9 built-in rules");
-    assert!(names.contains(&"aws-access-key"));
-    assert!(names.contains(&"private-key"));
+    // Check that every expected built-in rule is present.
+    for expected in [
+        "aws-access-key",
+        "aws-secret",
+        "github-token",
+        "github-fine-grained",
+        "openai-api-key",
+        "slack-token",
+        "jwt",
+        "private-key",
+        "bearer-token",
+        "generic-password",
+        "gpl-in-mit",
+    ] {
+        assert!(names.contains(&expected), "missing rule: {}", expected);
+    }
 }
 
 #[test]
