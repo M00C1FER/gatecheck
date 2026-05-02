@@ -5,7 +5,7 @@
 //!   1  — findings at or above fail threshold (commit / CI should abort)
 //!   2  — usage / config error
 
-use gatecheck::{scan, should_fail, Config, Finding, Severity};
+use gatecheck::{scan, should_fail, Config, Finding};
 use std::env;
 use std::fs;
 use std::io::{self, Read};
@@ -203,6 +203,7 @@ fn main() -> ExitCode {
 #[cfg(test)]
 mod main_tests {
     use super::*;
+    use gatecheck::{Finding, Severity};
 
     #[test]
     fn fail_threshold_logic() {

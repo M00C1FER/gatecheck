@@ -14,7 +14,7 @@
 
 ## What it does
 
-- Scans staged diffs / files / stdin for secrets across **9+ built-in rules**: AWS keys/secrets, GitHub tokens (classic + fine-grained), Slack tokens, JWTs, private-key blocks, generic Bearer tokens, hardcoded passwords, and license-conflict text (e.g., GPL boilerplate in an MIT project).
+- Scans staged diffs / files / stdin for secrets across **10+ built-in rules**: AWS keys/secrets, GitHub tokens (classic + fine-grained), OpenAI API keys, Slack tokens, JWTs, private-key blocks, generic Bearer tokens, hardcoded passwords, and license-conflict text (e.g., GPL boilerplate in an MIT project).
 - Configurable `gatecheck.toml`: per-rule disable, exemption regexes, fail threshold.
 - Three input modes: file/stdin (default), `--staged` (`git diff --cached`), `--diff` (working tree).
 - Library API for embedding in other Rust dev tools.
@@ -48,7 +48,17 @@ set -e
 gatecheck --staged --threshold high
 ```
 
-Or with the [pre-commit](https://pre-commit.com) framework — see [`examples/`](examples/).
+Or with the [pre-commit](https://pre-commit.com) framework — add to `.pre-commit-config.yaml`:
+
+```yaml
+repos:
+  - repo: https://github.com/M00C1FER/gatecheck
+    rev: v0.1.0
+    hooks:
+      - id: gatecheck
+```
+
+See also [`examples/`](examples/).
 
 ## Configuration (`gatecheck.toml`)
 
@@ -73,8 +83,9 @@ A copy lives at [`examples/gatecheck.example.toml`](examples/gatecheck.example.t
 |---|---|---|
 | `aws-access-key`      | critical | `AKIA…` access-key IDs |
 | `aws-secret`          | critical | secret-access-key shapes |
-| `github-token`        | critical | `gh{p,o,u,s,r}_…` PATs |
+| `github-token`        | critical | `gh{p,o,u,s,r}_…` classic PATs |
 | `github-fine-grained` | critical | `github_pat_…` fine-grained PATs |
+| `openai-api-key`      | critical | `sk-proj-…` / `sk-…` OpenAI API keys |
 | `slack-token`         | high     | `xox[baprs]-…` |
 | `private-key`         | critical | `-----BEGIN … PRIVATE KEY-----` |
 | `jwt`                 | medium   | three-segment JWT shape |
@@ -109,7 +120,22 @@ if should_fail(&findings, Severity::High) {
 cargo test
 ```
 
-12 tests cover: every built-in rule, exemption patterns, rule-disable config, fail-threshold logic, line numbering, and the doc-test.
+14 tests cover: every built-in rule (including OpenAI API keys), exemption patterns, rule-disable config, fail-threshold logic, line numbering, and the doc-test.
+
+## Cross-platform notes
+
+`gatecheck` is a single statically-linked binary (via `cargo build --release` with `lto = true`) and runs on any platform supported by the Rust toolchain.
+
+| Platform | Install method | Notes |
+|---|---|---|
+| **Debian/Ubuntu** | `cargo install gatecheck` or download release binary | Tier 1 |
+| **Arch / Manjaro** | `cargo install gatecheck` | Tier 2 |
+| **Fedora / RHEL / Rocky** | `cargo install gatecheck` | Tier 2 |
+| **Alpine** | `cargo install gatecheck` (requires musl toolchain: `cargo install --target x86_64-unknown-linux-musl`) | Best effort |
+| **WSL2** | Same as Ubuntu — no `/sys/firmware/efi` assumptions made | ✅ |
+| **Termux (Android arm64)** | `pkg install rust && cargo install gatecheck` | ✅ |
+
+For Alpine or minimal environments, a pre-built `x86_64-unknown-linux-musl` binary can be used directly without any dynamic library dependencies.
 
 ## Roadmap
 
